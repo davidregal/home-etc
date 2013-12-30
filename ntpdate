@@ -1,0 +1,3 @@
+#!/bin/sh
+# Sync time
+ntpdate ntp.ubuntu.com
