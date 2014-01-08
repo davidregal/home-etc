@@ -191,13 +191,14 @@ if [[ $platform == 'linux' ]]; then
 
 	ssh-add -l >/dev/null 2>&1
 	if [ $? = 2 ]; then
-	   # No ssh-agent running
-	   rm -rf $SSH_AUTH_SOCK
-	   # >| allows output redirection to over-write files if no clobber is set
-	   ssh-agent -a $SSH_AUTH_SOCK >| /tmp/.ssh-script
-	   source /tmp/.ssh-script
-	   echo $SSH_AGENT_PID >| ~/.ssh/ssh-agent-pid
-	   rm /tmp/.ssh-script
+		# No ssh-agent running
+		rm -rf $SSH_AUTH_SOCK
+		# >| allows output redirection to over-write files if no clobber is set
+		ssh-agent -a $SSH_AUTH_SOCK >| /tmp/.ssh-script
+		source /tmp/.ssh-script
+		echo $SSH_AGENT_PID >| ~/.ssh/ssh-agent-pid
+		rm /tmp/.ssh-script
+		ssh-add ~/.ssh/id_rsa
 	fi
 fi
 
