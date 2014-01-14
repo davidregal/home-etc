@@ -25,6 +25,8 @@ fi
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
     xterm-color) color_prompt=yes;;
+    # OSX Mountain Lion and up changed the Terminal type from xterm-color to xterm-256color
+    xterm-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -44,7 +46,13 @@ if [ -n "$force_color_prompt" ]; then
 fi
 
 if [ "$color_prompt" = yes ]; then
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    # The method I use is to generate a color for the hostname from the hostname. There are not many colors to choose from so it will easily generate clashes, but it's useful for the small amount of machines that I manage.
+   # The first line generates a number between 30 (inc) and 36 (exc) from the hostname of the machine. The second line applies it to the prompt with username and path in green (32) and the host name in the generated color.
+    # No background colors are set, and I exclude cyan (36) and white (37) from the foreground to avoid clashes with the backgrounds of terminals that I use. Credit: http://serverfault.com/questions/221108/different-color-prompts-for-different-machines-when-using-terminal-ssh/425657#425657.
+    hostnamecolor=$(hostname | od | tr ' ' '\n' | awk '{total = total + $1}END{print 30 + (total % 6)}')
+    #Original from SO: 
+    #PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\[\e[${hostnamecolor}m\]\]\h \[\e[32m\]\w\[\e[0m\]\n$ '
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\[\e[${hostnamecolor}m\]\]\h:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
