@@ -51,8 +51,13 @@ if [ "$color_prompt" = yes ]; then
     # No background colors are set, and I exclude cyan (36) and white (37) from the foreground to avoid clashes with the backgrounds of terminals that I use. Credit: http://serverfault.com/questions/221108/different-color-prompts-for-different-machines-when-using-terminal-ssh/425657#425657.
     hostnamecolor=$(hostname | od | tr ' ' '\n' | awk '{total = total + $1}END{print 30 + (total % 6)}')
     #Original from SO: 
-    #PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\[\e[${hostnamecolor}m\]\]\h \[\e[32m\]\w\[\e[0m\]\n$ '
-    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\[\e[${hostnamecolor}m\]\]\h:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='\[\e]0;\w\a\]\n\[\e[32m\]\u@\[\e[${hostnamecolor}m\]\]\h \[\e[32m\]\w\[\e[0m\]\n$ '
+    # Does not work with wrap:
+    #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\[\e[${hostnamecolor}m\]\]\h:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    # Works with wrap:
+    #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@ \[\e[${hostnamecolor}m\]\]\h \[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+    #PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[${hostnamecolor}m\]:\[\033[01;34m\]\w\[\033[00m\]\$ '
 else
     PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
