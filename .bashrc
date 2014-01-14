@@ -20,6 +20,18 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
     debian_chroot=$(cat /etc/debian_chroot)
 fi
 
+
+function set_tab_title
+{
+	local title="$1"
+	if [[ -z "$title" ]]; then
+		title=${USER}
+	fi
+		
+	# Rename the tab to the person logged in
+	echo -n -e "\033]0;$title\007"
+}
+
 ########################### Color and Prompt ###################################
 
 # set a fancy prompt (non-color, unless we know we "want" color)
@@ -72,11 +84,18 @@ if [ -x /usr/bin/dircolors ]; then
     alias ls='ls --color=auto'
     alias dir='dir --color=auto'
     alias vdir='vdir --color=auto'
-
-    alias grep='grep --color=auto'
-    alias fgrep='fgrep --color=auto'
-    alias egrep='egrep --color=auto'
 fi
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+#WARNING: When using grep --color=always, the actual strings being passed on to the next pipe will be changed. This can lead to the following situation:
+#$ grep --color=always -e '1' * | grep -ve '12'
+#11
+#12
+#13
+#Even though the option -ve '12' should exclude the middle line, it will not because there are color characters between 1 and 2.
+alias cgrep='grep --color=always'
 
 ########################### Completion #########################################
 
@@ -207,6 +226,20 @@ if [[ $platform == 'linux' ]]; then
 		rm /tmp/.ssh-script
 		ssh-add ~/.ssh/id_rsa
 	fi
+elif [[ $platform == 'osx' ]]; then
+	#CLICOLOR=1 simply enables coloring of your terminal.
+	export CLICOLOR=1
+	
+	############################### Path ######################################
+	# Set path for user scripts
+	export PATH="$PATH:/Users/dave/bin:/Applications/Doxygen.app/Contents/Resources"
+	
+	# Android dev env
+	export PATH="$PATH:/Users/Shared/bin/android-sdk/tools:/Users/Shared/bin/android-sdk/platforms:/Users/Shared/bin/android-sdk/platform-tools"
+	
+	# MacPorts Installer addition on 2012-12-02_at_19:46:10: adding an appropriate PATH variable for use with MacPorts.
+	export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+	# Finished adapting your PATH environment variable for use with MacPorts.
 fi
 
 # Debug
