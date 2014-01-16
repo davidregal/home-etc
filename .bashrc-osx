@@ -1,0 +1,176 @@
+# $Id: .bashrc 49 2013-08-14 17:04:35Z dave $
+# $URL: file:///var/svn/reposit/trunk/homeetc/.bashrc $
+
+# If not running interactively, don't do anything.
+# For compatibility when calling after SSH connection.
+[ -z "$PS1" ] && return
+
+# Color
+#export TERM=xterm-color  # Do not need to declare xterm-color since Mac OS X does this in preferences.
+export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+export CLICOLOR=1
+
+function set_tab_title
+{
+	local title="$1"
+	if [[ -z "$title" ]]; then
+		title=${USER}
+	fi
+		
+	# Rename the tab to the person logged in
+	echo -n -e "\033]0;$title\007"
+}
+
+########################### Color and Prompt ###################################
+
+# used in command prompt
+NM="\[\033[0;38m\]" #means no background and white lines
+HI="\[\033[0;37m\]" #change this for letter colors
+HII="\[\033[0;31m\]" #change this for letter colors
+SI="\[\033[0;33m\]" #this is for the current directory
+IN="\[\033[0m\]"
+
+
+# set prompt differently based upon the user that is logged in
+# root gets a red prompt as a reminder, everybody else gets yellow
+case `id -u` in
+	0) export PS1="$HII\w$NM $ $IN" ;;
+	*) export PS1="$SI\w$NM $ $IN" ;;
+esac
+
+#	0) export PS1="$HII\w$NM $ $IN" ;;
+# PS1='\[\e]0;\u@\h: \w\a\]${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+
+# Set terminal window title
+#export PROMPT_COMMAND='echo -ne "\033]0;${USER}@${HOSTNAME%%.*} ${PWD}"; echo -ne "\007"' # good for working on servers
+export PROMPT_COMMAND='echo -ne "\033]0; ${PWD}"; echo -ne "\007"'
+set_tab_title
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias dir='dir --color=auto'
+    alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+########################### Completion #########################################
+
+# enable programmable completion features (you don't need to enable
+# this, if it's already enabled in /etc/bash.bashrc and /etc/profile
+# sources /etc/bash.bashrc).
+if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
+    . /etc/bash_completion
+fi
+
+############################### Aliases ########################################
+# Alias definitions.
+# You may want to put all your additions into a separate file like
+# ~/.bash_aliases, instead of adding them here directly.
+# See /usr/share/doc/bash-doc/examples in the bash-doc package.
+
+if [ -f ~/.bash_aliases ]; then
+    . ~/.bash_aliases
+fi
+
+############################### History ########################################
+
+# don't put duplicate lines in the history. See bash(1) for more options
+# don't overwrite GNU Midnight Commander's setting of `ignorespace'.
+HISTCONTROL=$HISTCONTROL${HISTCONTROL+:}ignoredups
+# ... or force ignoredups and ignorespace
+HISTCONTROL=ignoreboth
+
+# append to the history file, don't overwrite it
+shopt -s histappend
+
+# for setting history length see HISTSIZE and HISTFILESIZE in bash(1)
+export HISTSIZE=100000          # big big history
+shopt -s histverify # edit a recalled history line before executing
+
+################### Allow history accross all Term windows #####################
+# Credit: http://stackoverflow.com/questions/103944/real-time-history-export-amongst-bash-terminal-windows/3055135#3055135
+
+# Here is my [lesmana] attempt at Bash session history sharing. This will enable history sharing in a way that the history counter does not get mixed up and history expansion like !number will work with some constraints.
+
+# The function history() overrides the builtin history to make sure that the history is synchronised before it is displayed. This is necessary for the history expansion by number (more about this later).
+history() {
+_bash_history_sync
+	builtin history "$@"
+}
+
+# Save and reload the history after each command finishes
+_bash_history_sync() {
+  builtin history -a         #[1]
+  HISTFILESIZE=$HISTFILESIZE #[2]
+  builtin history -c         #[3]
+  builtin history -r         #[4]
+}
+
+#[1] Append the just entered line to the $HISTFILE (default is .bash_history). This will cause $HISTFILE to grow by one line.
+
+#[2] Setting the special variable $HISTFILESIZE to some value will cause Bash to truncate $HISTFILE to be no longer than $HISTFILESIZE by removing the oldest entries.
+
+#[3] Clear the history of the running session. This will reduce the history counter by the amount of $HISTSIZE.
+
+#[4] Read the contents of $HISTFILE and insert them in to the current running session history. this will raise the history counter by the amount of lines in $HISTFILE.
+
+#More explanation:
+#
+# Step [1] ensures that the command from the current running session gets written to the global history file.
+#
+# Step [4] ensures that the commands from the other sessions gets read in to the current session history.
+#
+# Because step [4] will raise the history counter, we need to reduce the counter in some way. This is done in step [3].
+#
+# In step [3] the history counter is reduced by $HISTSIZE. In step [4] the history counter is raised by the number of lines in $HISTFILE. In step [2] we make sure that the line count of $HISTFILE is exactly $HISTSIZE (this means that $HISTFILESIZE must be the same as $HISTSIZE).
+
+# Strange bugs:
+
+# Running the history command piped to anything will result that command to be listed in the history twice. For example:
+#
+#$ history | head
+#$ history | tail
+#$ history | grep foo
+#$ history | true
+#$ history | false
+# All will be listed in the history twice. I have no idea why.
+
+# Ideas for improvements:
+
+# Modify the function _bash_history_sync() so it does not execute every time. For example it should not execute after a CTRL+C on the prompt. I often use CTRL+C to discard a long command line when I decide that I do not want to execute that line. Sometimes I have to use CTRL+C to stop a Bash completion script.
+
+# Commands from the current session should always be the most recent in the history of the current session. This will also have the side effect that a given history number keeps its value for history entries from this session.
+
+export PROMPT_COMMAND=_bash_history_sync
+
+############################# Editors ##########################################
+# Command Line Editor
+set -o vi
+# Editor for SVN
+export SVN_EDITOR=vi
+
+############################### Path ###########################################
+
+# Set path for user scripts
+export PATH="$PATH:/Users/dave/bin:/Applications/Doxygen.app/Contents/Resources"
+
+# Android dev  env
+export PATH="$PATH:/Users/Shared/bin/android-sdk/tools:/Users/Shared/bin/android-sdk/platforms:/Users/Shared/bin/android-sdk/platform-tools"
+
+##
+# Your previous /Users/dave/.bash_profile file was backed up as /Users/dave/.bash_profile.macports-saved_2012-12-02_at_19:46:10
+##
+
+# MacPorts Installer addition on 2012-12-02_at_19:46:10: adding an appropriate PATH variable for use with MacPorts.
+export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+# Finished adapting your PATH environment variable for use with MacPorts.
+
+# Dev environment
+#IP Address of WINGS VMware Dev environment
+export IPWVD=172.16.43.3
+

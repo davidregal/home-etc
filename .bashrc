@@ -62,7 +62,7 @@ if [ "$color_prompt" = yes ]; then
    # The first line generates a number between 30 (inc) and 36 (exc) from the hostname of the machine. The second line applies it to the prompt with username and path in green (32) and the host name in the generated color.
 	# No background colors are set, and I exclude cyan (36) and white (37) from the foreground to avoid clashes with the backgrounds of terminals that I use. Credit: http://serverfault.com/questions/221108/different-color-prompts-for-different-machines-when-using-terminal-ssh/425657#425657.
 	hostnamecolor=$(hostname | od | tr ' ' '\n' | awk '{total = total + $1}END{print 30 + (total % 6)}')
-	PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+	PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
 else
 	PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 fi
@@ -226,8 +226,10 @@ if [[ $platform == 'linux' ]]; then
 		ssh-add ~/.ssh/id_rsa
 	fi
 elif [[ $platform == 'osx' ]]; then
-	#CLICOLOR=1 simply enables coloring of your terminal.
+	# CLICOLOR=1 simply enables coloring of your terminal.
 	export CLICOLOR=1
+	#export GREP_OPTIONS='--color=auto' GREP_COLOR='1;32'
+	GREP_COLOR='1;32'
 	
 	############################### Path ######################################
 	# Set path for user scripts
