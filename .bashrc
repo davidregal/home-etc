@@ -2,6 +2,12 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 
+if [[ -s /opt/bitnami/.bitnamirc ]]; then
+	PATH="/opt/bitnami/memcached/bin:/opt/bitnami/varnish/bin:/opt/bitnami/redis/bin:/opt/bitnami/nodejs/bin:/opt/bitnami/mercurial/bin:/opt/bitnami/perl/bin:/opt/bitnami/git/bin:/opt/bitnami/nginx/sbin:/opt/bitnami/frameworks/laravel/app/Console:/opt/bitnami/frameworks/cakephp/app/Console:/opt/bitnami/frameworks/codeigniter/bin:/opt/bitnami/frameworks/symfony/bin:/opt/bitnami/frameworks/zendframework/app/Console:/opt/bitnami/sphinx/bin:/opt/bitnami/mongodb/bin:/opt/bitnami/sqlite/bin:/opt/bitnami/apps/django/bin:/opt/bitnami/php/bin::/opt/bitnami/java/bin:/opt/bitnami/mysql/bin:/opt/bitnami/postgresql/bin:/opt/bitnami/apache2/bin:/opt/bitnami/python/bin:/opt/bitnami/subversion/bin:/opt/bitnami/ruby/bin:/opt/bitnami/common/bin:$PATH"
+	export PATH
+	source /opt/bitnami/.bitnamirc
+fi
+
 # If not running interactively, don't do anything
 [ -z "$PS1" ] && return
 
@@ -13,7 +19,7 @@ echo "Entering .bashrc"
 shopt -s checkwinsize
 
 # make less more friendly for non-text input files, see lesspipe(1)
-#[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 # set variable identifying the chroot you work in (used in the prompt below)
 if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
