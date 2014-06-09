@@ -5,7 +5,7 @@ echo "Entering .bash_aliases"
 alias ..="cd .." # two dots moves you up one
 alias ...="cd .. ; cd .." # three dots moves you up two levels in your path
 alias ll="ls -la" # long list, includes dot files
-alias la='ls -A'  # list all, do not include dot files
+alias la='ls -A'  # list all, includes dot files
 alias l='ls -CF'
 
 # Personal aliases
