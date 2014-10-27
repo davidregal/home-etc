@@ -1,0 +1,4 @@
+# For specific aliases that vary on hosts
+# Enable by creating a sym link to .bash_aliases_local
+# E.g. ln -s ~/etc/.bash_aliases_johnhenry ~/.bash_aliases_local
+alias git="/usr/local/cpanel/3rdparty/bin/git"

@@ -11,5 +11,8 @@ alias l='ls -CF'
 # Personal aliases
 alias stt='set_tab_title'
 
+# Host Environment specific aliases
+. ~/.bash_aliases_local
+
 # Debug
 echo "Leaving .bash_aliases"
