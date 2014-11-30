@@ -1,0 +1,19 @@
+# This file is used by Puppet to track sites and mods being enabled/disabled 
+# and knowing when to restart Apache.  This is done by maintaining a list of
+# enabled and disabled sites and mods here.
+#
+# When puppet detects a change to this file (by changing any of the lists of
+# sites or mods), it will exec a2dissite, a2ensite, a2dismod and a2enmod with
+# the complete list of mods and trigger an Apache2 restart.
+#
+# Enabled modules: 
+# alias auth_basic authn_file authz_default authz_groupfile authz_host authz_user autoindex cgi dir env headers mime negotiation php5 reqtimeout rewrite setenvif ssl status
+#
+# Disabled modules:
+# 
+#
+# Enabled sites:
+# default
+#
+# Disabled sites:
+# offline
