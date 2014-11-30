@@ -1,11 +1,4 @@
-# Starting MySQL 5.5, InnoDB becomes the default storage engine replacing MyISAM. There are many performance improvements in this release. In particular, crash recovery, the automatic process that makes all data consistent when the database is restarted, is fast and reliable. (Now much much faster than long-time InnoDB users are used to.) The bigger the database, the more dramatic the speedup.
 #
-# Tweaking and optimizing your MySQL database server is quite subjective, with a lot of conditions and variables need to consider. Following settings might help you improve and delivering the great InnoDB database by putting the specific value in my.cnf of your server:
-
-# Credit: http://blog.secaserver.com/2011/08/mysql-recommended-my-cnf-settings-innodb-engine/
-
-# Description
-# Options
 # * InnoDB
 #
 # InnoDB is enabled by default with a 10MB datafile in /var/lib/mysql/.
@@ -38,7 +31,6 @@ innodb_additional_mem_pool_size=20M
 innodb_file_per_table
 
 # Set the log file size to about 25% of the buffer pool size.
-# If innodb_log_file_size is changed, then need to move /var/lib/mysql/ib_logfile* before starting mysql.
 # Production:
 #innodb_log_file_size=2048M
 # Development:
@@ -83,10 +75,9 @@ innodb_flush_method=O_DIRECT
 # Default is 50 seconds. Increase the value for reliability or decrease for performance
 innodb_lock_wait_timeout=120
 
-# If innodb_data_home_dir or innodb_data_file_path are changed, then need to move ibdata* and /var/lib/mysql/ib_logfile* ib_logfile* before starting mysql.
-innodb_data_home_dir = /var/lib/mysql/ibdata
+#innodb_data_home_dir = /var/lib/mysql
 # A tablespace containing a fixed-size 50MB data file named ibdata1 and a 50MB auto-extending file named ibdata2 in the data directory. Sizes are specified using K, M, or G suffix letters to indicate units of KB, MB, or GB. Data files must be able to hold your data and indexes total size.
 # Production:
 #innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend
 # Development:
-innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend
+#innodb_data_file_path=ibdata1:50M;ibdata2:50M:autoextend

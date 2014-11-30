@@ -85,6 +85,8 @@
 
 ; This is php.ini-production INI file.
 
+; This is php.ini-production INI file.
+
 ;;;;;;;;;;;;;;;;;;;
 ; Quick Reference ;
 ;;;;;;;;;;;;;;;;;;;
@@ -199,7 +201,7 @@ engine = On
 ; Development Value: Off
 ; Production Value: Off
 ; http://php.net/short-open-tag
-short_open_tag = Off
+short_open_tag = On
 
 ; Allow ASP-style <% %> tags.
 ; http://php.net/asp-tags
@@ -208,11 +210,6 @@ asp_tags = Off
 ; The number of significant digits displayed in floating point numbers.
 ; http://php.net/precision
 precision = 14
-
-; Enforce year 2000 compliance (will cause problems with non-compliant browsers)
-; http://php.net/y2k-compliance
-; WINGS specific
-y2k_compliance = On
 
 ; Output buffering is a mechanism for controlling how much output data
 ; (excluding headers and cookies) PHP should keep internally before pushing that
@@ -294,62 +291,7 @@ unserialize_callback_func =
 ; When floats & doubles are serialized store serialize_precision significant
 ; digits after the floating point. The default value ensures that when floats
 ; are decoded with unserialize, the data will remain the same.
-;Dist: serialize_precision = 17
-serialize_precision = 100
-
-; This directive allows you to enable and disable warnings which PHP will issue
-; if you pass a value by reference at function call time. Passing values by
-; reference at function call time is a deprecated feature which will be removed
-; from PHP at some point in the near future. The acceptable method for passing a
-; value by reference to a function is by declaring the reference in the functions
-; definition, not at call time. This directive does not disable this feature, it
-; only determines whether PHP will warn you about it or not. These warnings
-; should enabled in development environments only.
-; Default Value: On (Suppress warnings)
-; Development Value: Off (Issue warnings)
-; Production Value: Off (Issue warnings)
-; http://php.net/allow-call-time-pass-reference
-; WINGS specfic
-allow_call_time_pass_reference = Off
-
-; By default, Safe Mode does a UID compare check when
-; opening files. If you want to relax this to a GID compare,
-; then turn on safe_mode_gid.
-; http://php.net/safe-mode-gid
-; WINGS specfic
-safe_mode_gid = Off
-
-; When safe_mode is on, UID/GID checks are bypassed when
-; including files from this directory and its subdirectories.
-; (directory must also be in include_path or full path must
-; be used when including)
-; http://php.net/safe-mode-include-dir
-; WINGS specfic
-safe_mode_include_dir =
-
-; When safe_mode is on, only executables located in the safe_mode_exec_dir
-; will be allowed to be executed via the exec family of functions.
-; http://php.net/safe-mode-exec-dir
-; WINGS specfic
-safe_mode_exec_dir =
-
-; Setting certain environment variables may be a potential security breach.
-; This directive contains a comma-delimited list of prefixes.  In Safe Mode,
-; the user may only alter environment variables whose names begin with the
-; prefixes supplied here.  By default, users will only be able to set
-; environment variables that begin with PHP_ (e.g. PHP_FOO=BAR).
-; Note:  If this directive is empty, PHP will let the user modify ANY
-;   environment variable!
-; http://php.net/safe-mode-allowed-env-vars
-; WINGS specfic
-safe_mode_allowed_env_vars = PHP_
-
-; This directive contains a comma-delimited list of environment variables that
-; the end user won't be able to change using putenv().  These variables will be
-; protected even if safe_mode_allowed_env_vars is set to allow to change them.
-; http://php.net/safe-mode-protected-env-vars
-; WINGS specfic
-safe_mode_protected_env_vars = LD_LIBRARY_PATH
+serialize_precision = 17
 
 ; open_basedir, if set, limits all file operations to the defined directory
 ; and below.  This directive makes most sense if used in a per-directory
@@ -362,7 +304,7 @@ safe_mode_protected_env_vars = LD_LIBRARY_PATH
 ; It receives a comma-delimited list of function names. This directive is
 ; *NOT* affected by whether Safe Mode is turned On or Off.
 ; http://php.net/disable-functions
-disable_functions =
+disable_functions = pcntl_alarm,pcntl_fork,pcntl_waitpid,pcntl_wait,pcntl_wifexited,pcntl_wifstopped,pcntl_wifsignaled,pcntl_wexitstatus,pcntl_wtermsig,pcntl_wstopsig,pcntl_signal,pcntl_signal_dispatch,pcntl_get_last_error,pcntl_strerror,pcntl_sigprocmask,pcntl_sigwaitinfo,pcntl_sigtimedwait,pcntl_exec,pcntl_getpriority,pcntl_setpriority,
 
 ; This directive allows you to disable certain classes for security reasons.
 ; It receives a comma-delimited list of class names. This directive is
@@ -453,7 +395,7 @@ max_input_time = 60
 
 ; Maximum amount of memory a script may consume (128MB)
 ; http://php.net/memory-limit
-memory_limit = -1
+memory_limit = 128M
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Error handling and logging ;
@@ -509,7 +451,6 @@ memory_limit = -1
 ; Development Value: E_ALL
 ; Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
 ; http://php.net/error-reporting
-; WINGS prev version of php.ini does not have ~STRICT: 'error_reporting = E_ALL & ~E_DEPRECATED'
 error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
 
 ; This directive controls whether or not and where PHP will output errors,
@@ -599,7 +540,6 @@ track_errors = Off
 ; Development Value: On
 ; Production value: On
 ; http://php.net/html-errors
-; WINGS Prev version had this off but the recommendation changed and description of the var is different.
 html_errors = On
 
 ; If html_errors is set to On *and* docref_root is not empty, then PHP
@@ -742,7 +682,7 @@ default_mimetype = "text/html"
 
 ; PHP's default character set is set to empty.
 ; http://php.net/default-charset
-default_charset = "UTF-8"
+;default_charset = "UTF-8"
 
 ; Always populate the $HTTP_RAW_POST_DATA variable. PHP's default behavior is
 ; to disable this feature. If post reading is disabled through
@@ -1001,14 +941,6 @@ pdo_mysql.default_socket=
 ;phar.require_hash = On
 
 ;phar.cache_list =
-
-[Syslog]
-; Whether or not to define the various syslog variables (e.g. $LOG_PID,
-; $LOG_CRON, etc.).  Turning it off is a good idea performance-wise.  In
-; runtime, you can define these variables by calling define_syslog_variables().
-; http://php.net/define-syslog-variables
-; WINGS specific
-define_syslog_variables  = Off
 
 [mail function]
 ; For Win32 only.
@@ -1482,8 +1414,7 @@ session.gc_divisor = 1000
 ; After this number of seconds, stored data will be seen as 'garbage' and
 ; cleaned up by the garbage collection process.
 ; http://php.net/session.gc-maxlifetime
-; Dist value: session.gc_maxlifetime = 1440
-session.gc_maxlifetime = 4500
+session.gc_maxlifetime = 1440
 
 ; NOTE: If you are using the subdirectory option for storing session files
 ;       (see session.save_path above), then garbage collection does *not*
@@ -1501,8 +1432,7 @@ session.referer_check =
 
 ; How many bytes to read from the file.
 ; http://php.net/session.entropy-length
-;Dist: session.entropy_length = 32
-session.entropy_length = 0
+;session.entropy_length = 32
 
 ; Specified here to create the session id.
 ; http://php.net/session.entropy-file
@@ -1720,8 +1650,7 @@ mssql.secure_connection = Off
 ; Some encoding cannot work as internal encoding.
 ; (e.g. SJIS, BIG5, ISO-2022-*)
 ; http://php.net/mbstring.internal-encoding
-;Dist: mbstring.internal_encoding = EUC-JP
-mbstring.internal_encoding = UTF-8
+;mbstring.internal_encoding = EUC-JP
 
 ; http input encoding.
 ; http://php.net/mbstring.http-input
