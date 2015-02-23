@@ -28,7 +28,6 @@
  
     "bitwise"       : true,     // Prohibit bitwise operators (&, |, ^, etc.).
     "curly"         : true,     // Require {} for every new block or scope.
-    "eqeqeq"        : true,     // Require triple equals i.e. `===`.
     "forin"         : true,     // Tolerate `for in` loops without `hasOwnPrototype`.
     "immed"         : true,     // Require immediate invocations to be wrapped in parens e.g. `( function(){}() );`
     "latedef"       : true,     // Prohibit variable use before definition.
@@ -84,7 +83,7 @@
     "couch"         : false,    // Enable globals exposed by CouchDB.
     "devel"         : false,    // Allow development statements e.g. `console.log();`.
     "dojo"          : false,    // Enable globals exposed by Dojo Toolkit.
-    "jquery"        : false,    // Enable globals exposed by jQuery JavaScript library.
+    "jquery"        : true,    // Enable globals exposed by jQuery JavaScript library.
     "mootools"      : false,    // Enable globals exposed by MooTools JavaScript framework.
     "node"          : false,    // Enable globals available when code is running inside of the NodeJS runtime environment.
     "nonstandard"   : false,    // Define non-standard but widely adopted globals such as escape and unescape.
