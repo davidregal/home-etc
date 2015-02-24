@@ -1,0 +1,81 @@
+# Generated from Puppet templates
+# webrootdir = /var/www
+# domainroot = nomos.local
+# escdomainroot = nomos\.local
+
+DocumentRoot /var/www
+
+<Directory />
+	Order deny,allow
+	Deny from All
+	AllowOverride None
+</Directory>
+
+<Directory /var/www>
+	Options Indexes FollowSymLinks MultiViews
+	AllowOverride All
+	Order allow,deny
+	allow from all
+</Directory>
+
+ServerAdmin support@nomos.local
+ServerName  nomos.local
+
+<VirtualHost *:80>
+	RewriteEngine On    # Turn on the rewriting engine
+	#RewriteRule    ^pet-care/?$    pet_care_info_01_02_2008.php    [NC,L]    # Handle requests for "pet-care"
+	RewriteRule    ^pet-care/?$    index.html    [NC,L]    # Handle requests for "pet-care"
+	RewriteMap lowercase  int:tolower
+
+	ServerAlias nomos.local
+
+	# Convert site.nomos.local and anything.site.nomos.local -> nomos.local/wings/site
+
+	# Convert nomos.local -> nomos.local
+	#RewriteCond %{HTTP_HOST} .
+	#RewriteCond %{HTTP_HOST} !^www\.nomos\.local$ [NC]
+	#RewriteRule /?(.*) http://www.nomos\.local/$1 [R=temp,L]
+
+	ErrorLog /var/log/apache2/error.log
+
+	# Possible values include: debug, info, notice, warn, error, crit,
+	# alert, emerg.
+	LogLevel debug 
+
+	CustomLog /var/log/apache2/access.log combined
+	ServerSignature On
+
+	Include rewrites
+</VirtualHost>
+
+<IfModule mod_ssl.c>
+	<VirtualHost *:443>
+		RewriteEngine On
+		RewriteMap lowercase  int:tolower
+		RewriteMap wingslookup txt:/var/www/wings/managed/sitemap.cfg
+
+		ServerAlias nomos.local
+		SSLEngine On
+		SetEnv USING_SSL 1
+
+		RewriteCond %{HTTP_HOST} !^$ [NC]
+		RewriteCond %{HTTP_HOST} !^(www\.?)nomos\.local$ [NC]
+		RewriteCond %{HTTP_HOST} ^(.*\.)?([^.]+)\.nomos\.local$ [NC]
+		RewriteRule ^(.+)$ %{HTTP_HOST}$1 [C]
+		RewriteRule ^(.*\.)?([^.]+)\.nomos\.local(.*) https://nomos.local/wings/${lowercase:$2}$3 [R=temp,L]
+
+		ErrorLog /var/log/apache2/error.log
+
+		# Possible values include: debug, info, notice, warn, error, crit,
+		# alert, emerg.
+		LogLevel warn
+
+		CustomLog /var/log/apache2/access.log combined
+		ServerSignature On
+
+		Include rewrites
+	</VirtualHost>
+</IfModule>		
+
+Alias /wiki /var/www/mediawiki/wiki/index.php
+Alias /docs /var/www/mediawiki/docs/index.php
