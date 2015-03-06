@@ -49,3 +49,20 @@ RewriteRule . ${wingslookup:%{ENV:WINGS_SITE}|/404}/%{ENV:WINGS_FILE}%{ENV:WINGS
 	Order allow,deny
 	Deny from all
 </FilesMatch>
+
+# BEGIN WordPress
+<Directory "/var/www">
+	RewriteEngine On
+	RewriteRule ^wings(/|$) - [L,NC]
+	RewriteRule ^admin(/|$) - [L,NC]
+	RewriteRule ^speller(/|$) - [L,NC]
+	RewriteRule ^mediawiki(/|$) - [L,NC]
+	RewriteRule ^common(/|$) - [L,NC]
+	RewriteBase /wordpress/
+	RewriteRule ^index\.php$ - [L]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /wordpress/index.php [L]
+</Directory>
+# END WordPress
+
