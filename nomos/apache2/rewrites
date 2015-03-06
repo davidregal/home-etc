@@ -1,0 +1,75 @@
+# Set loglevel to 2 for performance reasons. Set to 9 to temporarily debug.
+#RewriteLogLevel 9
+RewriteLogLevel 2
+RewriteLog /var/log/apache2/rewrite.log
+
+
+
+# DEBUG
+# Works: 
+#RewriteRule ^/foo$ /index.html
+#RewriteRule    ^/leadingslash/?$    /index.html    [NC]    # Handle requests for "pet-care"
+
+# Forbid /managed unless we rewrite to it.
+RewriteRule ^/wings/managed$ /wings/managed/
+
+RewriteCond %{ENV:REDIRECT_WINGS_FILE} =""
+RewriteRule ^/wings/managed/ - [Forbidden]
+
+# Test the above
+#RewriteRule ^/wings/foo$ /wings/managed/foo.php  [E=BLAH:1,LAST]
+
+# Determine what site we are dealing with.
+RewriteCond %{REQUEST_URI} ^(/+wings/+([^/]+)(/+([^/]*))?)(/.*)?$
+# Set some environment variables
+RewriteRule . - [SKIP=1,ENV=WINGS_SITE:%2,ENV=WINGS_FILE:%4,ENV=WINGS_PATHINFO:%5,ENV=WINGS_ROOT:%1]
+
+# We didn't match what we were looking for, so stop rewriting.
+RewriteRule . - [LAST]
+
+# Does the site directory exist?
+RewriteCond %{DOCUMENT_ROOT}/wings/%{ENV:WINGS_SITE} -d  [OR]
+RewriteCond %{DOCUMENT_ROOT}/wings/%{ENV:WINGS_SITE} -l
+# Yes, pass the request thru intact and let the legacy code handle it.
+RewriteRule . - [LAST]
+
+# Are we requesting a directory without a trailing slash?  If so, fix it up so subrequests work properly.
+RewriteCond %{REQUEST_URI} ^(/+wings/+([^/]+))$
+RewriteRule . %1/ [R,LAST]
+
+
+# Site directory doesn't exist, so we want to apply the new voodoo.
+# Did the user ask for a given file?  If not, pretend they asked for index.php (yay directoryindex)
+RewriteCond %{ENV:WINGS_FILE} =""
+RewriteRule . - [ENV=WINGS_FILE:index.php]
+
+
+# Forward .php files to gateway.
+RewriteCond %{ENV:WINGS_FILE} .php$
+RewriteRule . /wings/admin/gateway.php [LAST]
+
+# Look up www_path for stuff in the map.
+# djg 10.14.2011 include pathinfo so we can handle subdirs.
+RewriteRule . ${wingslookup:%{ENV:WINGS_SITE}|/404}/%{ENV:WINGS_FILE}%{ENV:WINGS_PATHINFO} [LAST]
+
+
+<FilesMatch "\.inc$">
+	Order allow,deny
+	Deny from all
+</FilesMatch>
+
+# BEGIN WordPress
+<Directory "/var/www">
+	RewriteEngine On
+	RewriteRule ^wings(/|$) - [L,NC]
+	RewriteRule ^admin(/|$) - [L,NC]
+	RewriteRule ^speller(/|$) - [L,NC]
+	RewriteRule ^mediawiki(/|$) - [L,NC]
+	RewriteRule ^common(/|$) - [L,NC]
+	RewriteBase /wordpress/
+	RewriteRule ^index\.php$ - [L]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /wordpress/index.php [L]
+</Directory>
+# END WordPress
