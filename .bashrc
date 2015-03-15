@@ -75,18 +75,20 @@ if [ "$color_prompt" = yes ]; then
 	hostnamecolor=$(hostname | od | tr ' ' '\n' | awk '{total = total + $1}END{print 30 + (total % 6)}')
 	# Check if NICKNAME var exists
 	if [ -z ${NICKNAME+x} ]; then
+		# Nickname does not exist. Use hostname.
+		PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+	else
 		# Use the nickname.
 		PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]${NICKNAME}\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
-	else
-		PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
 	fi
 else
 	# Check if NICKNAME var exists
 	if [ -z ${NICKNAME+x} ]; then
+		# Nickname does not exist. Use hostname.
+		PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+	else
 		# Use the nickname.
 		PS1='${debian_chroot:+($debian_chroot)}\u@${NICKNAME}:\w\$ '
-	else
-		PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
 	fi
 fi
 unset color_prompt force_color_prompt
@@ -96,10 +98,11 @@ case "$TERM" in
 xterm*|rxvt*)
 	# Check if NICKNAME var exists
 	if [ -z ${NICKNAME+x} ]; then
+		# Nickname does not exist. Use hostname.
+		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	else
 		# Use the nickname.
 		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@${NICKNAME}: \w\a\]$PS1"
-	else
-		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
 	fi
 	;;
 *)
