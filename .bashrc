@@ -27,6 +27,7 @@ if [ -z "$debian_chroot" ] && [ -r /etc/debian_chroot ]; then
 fi
 
 
+# @todo Fix this function. Right now after using it, the tab title goes back to what it was before.
 function set_tab_title
 {
 	local title="$1"
@@ -67,17 +68,39 @@ if [ "$color_prompt" = yes ]; then
 	# The method I use is to generate a color for the hostname from the hostname. There are not many colors to choose from so it will easily generate clashes, but it's useful for the small amount of machines that I manage.
    # The first line generates a number between 30 (inc) and 36 (exc) from the hostname of the machine. The second line applies it to the prompt with username and path in green (32) and the host name in the generated color.
 	# No background colors are set, and I exclude cyan (36) and white (37) from the foreground to avoid clashes with the backgrounds of terminals that I use. Credit: http://serverfault.com/questions/221108/different-color-prompts-for-different-machines-when-using-terminal-ssh/425657#425657.
+	#
+	# NICKNAME var is from profile.d/promt.sh
+	# Create a file in /etc/profile.d that sets the environment variable called NICKNAME to the value you want in the shell prompt. For example, to set the system nickname to webserver, execute the following command.  
+	# To setup NICKNAME var: $ sudo sh -c 'echo "export NICKNAME=webserver" > /etc/profile.d/prompt.sh'
 	hostnamecolor=$(hostname | od | tr ' ' '\n' | awk '{total = total + $1}END{print 30 + (total % 6)}')
-	PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+	# Check if NICKNAME var exists
+	if [ -z ${NICKNAME+x} ]; then
+		# Use the nickname.
+		PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]${NICKNAME}\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+	else
+		PS1='${debian_chroot:+($debian_chroot)}\[\033[00;34m\]\u@\[\e[${hostnamecolor}m\]\]\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\]\n$ '
+	fi
 else
-	PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+	# Check if NICKNAME var exists
+	if [ -z ${NICKNAME+x} ]; then
+		# Use the nickname.
+		PS1='${debian_chroot:+($debian_chroot)}\u@${NICKNAME}:\w\$ '
+	else
+		PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w\$ '
+	fi
 fi
 unset color_prompt force_color_prompt
 
 # If this is an xterm set the title to user@host:dir
 case "$TERM" in
 xterm*|rxvt*)
-	PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	# Check if NICKNAME var exists
+	if [ -z ${NICKNAME+x} ]; then
+		# Use the nickname.
+		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@${NICKNAME}: \w\a\]$PS1"
+	else
+		PS1="\[\e]0;${debian_chroot:+($debian_chroot)}\u@\h: \w\a\]$PS1"
+	fi
 	;;
 *)
 	;;
